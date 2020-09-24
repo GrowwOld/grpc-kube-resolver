@@ -2,6 +2,7 @@ package com.groww.grpc.kuberesolver;
 
 import io.grpc.NameResolver;
 import io.grpc.NameResolverProvider;
+import io.grpc.NameResolverRegistry;
 import io.grpc.internal.GrpcUtil;
 
 import javax.annotation.Nullable;
@@ -26,7 +27,7 @@ public class KubernetesNameResolverProvider extends NameResolverProvider {
 
     @Nullable
     @Override
-    public KubernetesNameResolver newNameResolver(URI targetUri, NameResolver.Helper helper) {
+    public KubernetesNameResolver newNameResolver(URI targetUri, NameResolver.Args args) {
         if(targetUri.getScheme().equals(getDefaultScheme())){
             if(Objects.isNull(targetUri.getPath())){
                 throw new NullPointerException("Must provide target path like kubernetes:///{namespace}/{service}:{port}");
