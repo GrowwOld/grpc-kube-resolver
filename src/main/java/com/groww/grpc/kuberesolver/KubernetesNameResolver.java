@@ -62,7 +62,7 @@ public class KubernetesNameResolver extends NameResolver {
     public void refresh() {
         if (refreshing) return;
         try {
-            log.info("Refreshing endpoints for {}",serviceName);
+            log.info("Refreshing endpoints for {}", serviceName);
             refreshing = true;
 
             Endpoints endpoints = kubernetesClient.endpoints().inNamespace(namespace)
@@ -75,7 +75,7 @@ public class KubernetesNameResolver extends NameResolver {
             }
 
             update(endpoints);
-            if(!watching){
+            if (!watching) {
                 watching = true;
                 executor.execute(this::watch);
             }
@@ -98,24 +98,25 @@ public class KubernetesNameResolver extends NameResolver {
                         .forEach(servers::add);
             }
         });
-        log.info("adding new endpoints for {} {}",serviceName,servers);
+        log.info("adding new endpoints for {} {}", serviceName, servers);
         listener.onAddresses(servers, Attributes.EMPTY);
     }
 
-    private void watch()  {
-        try{
-            log.info("starting watch for {}",serviceName);
+    private void watch() {
+        try {
+            log.info("starting watch for {}", serviceName);
             final CountDownLatch isWatchClosed = new CountDownLatch(1);
             kubernetesClient.endpoints().inNamespace(namespace)
                     .withName(serviceName)
                     .watch(new Watcher<Endpoints>() {
                         @Override
                         public void eventReceived(Action action, Endpoints endpoints) {
-                            System.out.println(action+endpoints.toString());
-                            switch (action){
+                            System.out.println(action + endpoints.toString());
+                            switch (action) {
                                 case ADDED:
                                 case MODIFIED:
-                                    update(endpoints);return;
+                                    update(endpoints);
+                                    return;
                                 case DELETED:
                                     listener.onAddresses(Collections.emptyList(), Attributes.EMPTY);
                             }
@@ -123,30 +124,28 @@ public class KubernetesNameResolver extends NameResolver {
 
                         @Override
                         public void onClose(KubernetesClientException e) {
-                            log.error("watch stream is closed for {}",serviceName);
+                            log.error("watch stream is closed for {}", serviceName);
                             watching = false;
                             refresh();
                             isWatchClosed.countDown();
                         }
                     });
             isWatchClosed.await();
-        } catch (InterruptedException e){
-            log.error("watch stream is interrupted for {}",serviceName);
-            watching =false;
+        } catch (InterruptedException e) {
+            log.error("watch stream is interrupted for {}", serviceName);
+            watching = false;
             refresh();
             Thread.currentThread().interrupt();
         }
     }
 
-
     public void shutdown() {
-
         if (this.executor != null) {
             this.executor = SharedResourceHolder.release(this.executorResource, this.executor);
         }
-        if(this.scheduledExecutorService != null){
+        if (this.scheduledExecutorService != null) {
             this.scheduledExecutorService = SharedResourceHolder.release(
-                    this.timerServiceResource,this.scheduledExecutorService);
+                    this.timerServiceResource, this.scheduledExecutorService);
         }
         kubernetesClient.close();
     }
