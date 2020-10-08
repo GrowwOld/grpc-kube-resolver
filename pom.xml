@@ -7,18 +7,25 @@
     <artifactId>grpc-kube-resolver</artifactId>
     <version>0.0.1</version>
     <name>grpc-kube-resolver</name>
+    <url>https://github.com/Groww/grpc-kube-resolver</url>
     <description>Kubernetes Resolver for Grpc</description>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>groww-artifacts-snapshot</id>
-            <url>http://10.82.10.10:8081/repository/groww-artifacts-snapshot/</url>
-        </snapshotRepository>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <repositories>
         <repository>
-            <id>groww-artifacts-release</id>
-            <url>http://10.82.10.10:8081/repository/groww-artifacts-release/</url>
+            <id>clojars</id>
+            <name>Clojars repository</name>
+            <url>https://clojars.org/repo</url>
         </repository>
-    </distributionManagement>
+    </repositories>
 
     <properties>
         <java.version>1.8</java.version>
